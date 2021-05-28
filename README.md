@@ -1,37 +1,27 @@
-## Welcome to GitHub Pages
+## Welcome to the laboratory
 
-You can use the [editor on GitHub](https://github.com/km19809/km19809.github.io/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+잡동사니 가득한 실험실에 오신 것을 환영합니다.
+### 프로젝트
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* [자이로를 활용한 조작](https://km19809.github.io/gyro/index.html): Break out with gyro control (experimental)
+* [카카오톡 검색해야 볼 수 있는 메시지 만들기](https://km19809.github.io/figlet/index.html)
+### 자작 (외부 링크)
+* [카카오톡 전체보기 메시지 만들기](https://svelte.dev/repl/7f4ad0f4e7d84af6bde68a975b93fad3)
+* [동적계획법 사용한 길찾기](https://svelte.dev/repl/efe14de1837d4ec6af34545260c08e3b): Shortest pathfinding with DP
+<hr>
 
-### Markdown
+[자보게동](https://comic.naver.com/bestChallenge/list.nhn?titleId=734597) 아십니까? 정말 좋습니다.<br>
+자보게동 팬 게임들:<br>
+* [초성 땅따먹기 타일 생성기](https://svelte.dev/repl/950e8906196c43f6ad36dc0ce69dfd88)
+* [무지개](https://svelte.dev/repl/864d1f42719f4c4188f42b0a6339e003)
+* [무지개 카드 무제한](https://svelte.dev/repl/498d2389ca2546a2866a6f6cfbe265fc)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
+<!--
 ### Jekyll Themes
 
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/km19809/km19809.github.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.-->
