@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width">
+    <title>카카오톡 검색 메시지</title>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
+    <script type="text/javascript" src="figlet.js"></script>
+
+    <script>
+
+        function chunk(array, size) {
+            const chunked = [];
+            let index = 0;
+
+            while (index < array.length) {
+                chunked.push(array.slice(index, index + size));
+                index += size;
+            }
+            return chunked;
+        }
+
+        let params = new URLSearchParams(document.location.search.substring(1));
+        let msg = params.get("msg") || "안녕"; // is the string "Jonathan"
+        figlet(msg, {
+            font: "Sam3KR-16",
+            horizontalLayout: 'default',
+            verticalLayout: "universal smushing",
+            width: 16,
+            whitespaceBreak: true
+        }, function (err, text) {
+            if (err) {
+                console.log('something went wrong...' + "Sam3KR-16");
+                console.dir(err);
+                return;
+            }
+            let container = document.getElementById("text_container")
+            while (container.lastElementChild) {
+                container.removeChild(container.lastElementChild);
+            }
+            const texts = chunk(text.replace(/[# ]/g, m => { return { "#": 2, " ": 5 }[m] }), 496);
+            for (let i in texts) {
+                let t = texts[i];
+                console.log(t);
+                let elem = document.createElement("textarea");
+                elem.setAttribute("readonly", "");
+                elem.innerHTML = t.replace(/\r\n|\r|\n/g, "&#13;&#10;");
+                elem.addEventListener('click', function () {
+                    elem.select();
+                    elem.setSelectionRange(0, 99999);
+                    document.execCommand("copy");
+                    alert(`${texts.length}개 항목 중 ${-(-i) +1}번째 항목을 복사했어요.`);
+                })
+                container.appendChild(elem);
+            }
+        });
+
+        
+
+    </script>
+    <style>
+        textarea {
+            resize: none;
+            white-space: pre-wrap;
+            height: 40em;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="text_container">
+        <span>메시지를 생성 중입니다.</span>
+    </div>
+    <p>텍스트를 클릭해 복사<br />
+        또는<br />
+        <input id="input" placeholder="메시지를 입력하세요" />
+        <button id="button">메시지 만들기</button>
+    </p>
+    <script>
+
+            let button = document.getElementById('button');
+            button.addEventListener('click', 
+            () => { let input = document.getElementById('input'); 
+            location.href = `${location.origin}${location.pathname}?msg=${input.value}`; });
+    </script>
+</body>
+
+</html>

@@ -4,7 +4,7 @@
 ### 프로젝트
 
 * [자이로를 활용한 조작](https://km19809.github.io/gyro/index.html): Break out with gyro control (experimental)
-* [카카오톡 검색해야 볼 수 있는 메시지 만들기](https://km19809.github.io/figlet/index.html)
+* [카카오톡 비밀 메시지 만들기](https://km19809.github.io/figlet/index.html)
 ### 자작 (외부 링크)
 * [카카오톡 전체보기 메시지 만들기](https://svelte.dev/repl/7f4ad0f4e7d84af6bde68a975b93fad3)
 * [동적계획법 사용한 길찾기](https://svelte.dev/repl/efe14de1837d4ec6af34545260c08e3b): Shortest pathfinding with DP
