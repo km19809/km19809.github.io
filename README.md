@@ -19,7 +19,7 @@
 * [초성 땅따먹기 타일 생성기](https://svelte.dev/repl/950e8906196c43f6ad36dc0ce69dfd88) 2020.09
 * [무지개](https://svelte.dev/repl/864d1f42719f4c4188f42b0a6339e003) 2020.09.27
 * [무지개 카드 무제한](https://svelte.dev/repl/498d2389ca2546a2866a6f6cfbe265fc) 2020.09.27
-
+* [컴퍼스 (Github Page)](https://km19809.github.io/game-of-compass/index.html) 2021.08.27
 
 <!--
 ### Jekyll Themes
