@@ -7,6 +7,7 @@
 * [자이로를 활용한 조작](https://km19809.github.io/gyro/index.html): Break out with gyro control (experimental) 2021.05.20
 * [카카오톡 비밀 메시지 만들기](https://km19809.github.io/figlet/index.html) 2021.05.28
 * [색을 듣다](https://km19809.github.io/hear-the-colors) Hear the colors 2021.08.23
+* [연주자를 찾아라](https://km19809.github.io/find-the-player) Find the player 2021.09.04
 
 ### 자작 (외부 링크)
 
