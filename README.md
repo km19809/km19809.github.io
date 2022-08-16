@@ -14,13 +14,14 @@
 * [카카오톡 전체보기 메시지 만들기](https://svelte.dev/repl/7f4ad0f4e7d84af6bde68a975b93fad3) 2021.05.17
 * [동적계획법 사용한 길찾기](https://svelte.dev/repl/efe14de1837d4ec6af34545260c08e3b): Shortest pathfinding with DP 2020.09.12
 
-> [자보게동](https://comic.naver.com/bestChallenge/list.nhn?titleId=734597) 아십니까?
+> [자보게동](https://comic.naver.com/bestChallenge/list.nhn?titleId=734597) 아십니까? 정말 재밌습니다.
 
 > 자보게동 팬 게임:<br>
 * [초성 땅따먹기 타일 생성기](https://svelte.dev/repl/950e8906196c43f6ad36dc0ce69dfd88) 2020.09
 * [무지개](https://svelte.dev/repl/864d1f42719f4c4188f42b0a6339e003) 2020.09.27
 * [무지개 카드 무제한](https://svelte.dev/repl/498d2389ca2546a2866a6f6cfbe265fc) 2020.09.27
 * [컴퍼스 (Github Page)](https://km19809.github.io/game-of-compass/index.html) 2021.08.27
+* [오리배](https://svelte.dev/repl/70ce73d4da69414b8811285e082aa57a) 2021.10.03
 
 <!--
 ### Jekyll Themes
