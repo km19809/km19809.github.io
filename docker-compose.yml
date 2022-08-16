@@ -3,7 +3,7 @@ version: "3.3"
 services:
   blog:
     build: .
-    image: 
+    image: jekyll/jekyll:3
     command: jekyll serve --force_polling --drafts --livereload --trace
     ports:
       - "4000:4000"
