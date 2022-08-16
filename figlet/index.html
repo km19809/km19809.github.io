@@ -22,7 +22,7 @@
         }
 
         let params = new URLSearchParams(document.location.search.substring(1));
-        let msg = params.get("msg") || "안녕"; // is the string "Jonathan"
+        let msg = params.get("msg") || "안녕";
         figlet(msg, {
             font: "sam3kr",
             horizontalLayout: 'default',

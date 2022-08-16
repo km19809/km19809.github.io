@@ -587,7 +587,7 @@ var figlet = figlet || (function() {
        - opt - options object
     */
     function breakWord(figChars, len, opts) {
-        var result = {};
+        var result = {chars:[]};
         for (var i = figChars.length; --i;) {
             var w = joinFigArray(figChars.slice(0, i), len, opts);
             if (figLinesWidth(w) <= opts.width) {
