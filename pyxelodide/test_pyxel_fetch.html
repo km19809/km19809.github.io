@@ -1,44 +1,35 @@
 <!-- Bootstrap HTML for running the unit tests. -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>pyodide</title>
-    <script type="text/javascript">
-      window.logs = [];
-      console.log = function (message) {
-        window.logs.push(message);
-      };
-      console.warn = function (message) {
-        window.logs.push(message);
-      };
-      console.info = function (message) {
-        window.logs.push(message);
-      };
-      console.error = function (message) {
-        window.logs.push(message);
-      };
-    </script>
-    <script src="./pyodide.js"></script>
-  </head>
-  <body>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-    <script type="text/javascript">
-      async function main(){
-        const filename = (new URLSearchParams(location.search)).get("py") || "08_triangle_api"
-        const pyodide = await loadPyodide();
-        await pyodide.loadPackage("micropip")
-        const micropip = pyodide.pyimport("micropip")
-        await micropip.install("pyxel-1.8.0-cp37-abi3-emscripten_3_1_14_wasm32.whl")
-        const response = await fetch(`python/${filename}.py`)
-        if (response.status != 200)
-        {
-          pyodide.runPython(await (await fetch("python/00_moving_square.py")).text())
-        }
-        else {
-          pyodide.runPython(await response.text())
-        }
+
+<head>
+  <title>pyodide</title>
+  <script src="./pyodide.js"></script>
+</head>
+
+<body>
+  <button id="start">Start</button> <br>
+  <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  <script type="text/javascript">
+    async function main() {
+      const filename = (new URLSearchParams(location.search)).get("py") || "08_triangle_api"
+      const pyodide = await loadPyodide();
+      await pyodide.loadPackage("micropip")
+      const micropip = pyodide.pyimport("micropip")
+      await micropip.install("pyxel-1.8.0-cp37-abi3-emscripten_3_1_14_wasm32.whl")
+      const response = await fetch(`python/${filename}.py`)
+      const startButton = document.getElementById("start")
+      if (response.status != 200) {
+        const defaultScript = await (await fetch("python/00_moving_square.py")).text()
+        startButton.addEventListener("click", () => pyodide.runPython(defaultScript))
       }
-      main()
-    </script>
-  </body>
+      else {
+        const script = await response.text()
+        startButton.addEventListener("click", () => pyodide.runPython(script))
+      }
+    }
+    main()
+  </script>
+</body>
+
 </html>

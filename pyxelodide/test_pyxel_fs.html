@@ -1,49 +1,38 @@
 <!-- Bootstrap HTML for running the unit tests. -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>pyodide</title>
-    <script type="text/javascript">
-      window.logs = [];
-      console.log = function (message) {
-        window.logs.push(message);
-      };
-      console.warn = function (message) {
-        window.logs.push(message);
-      };
-      console.info = function (message) {
-        window.logs.push(message);
-      };
-      console.error = function (message) {
-        window.logs.push(message);
-      };
-    </script>
-    <script src="./pyodide.js"></script>
-  </head>
-  <body>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-    <script type="text/javascript">
-      async function main(){
-        const filename = (new URLSearchParams(location.search)).get("py") || "11_offscreen"
-        const pyodide = await loadPyodide();
-        await pyodide.loadPackage("micropip")
-        const micropip = pyodide.pyimport("micropip")
-        await micropip.install("pyxel-1.8.0-cp37-abi3-emscripten_3_1_14_wasm32.whl")
-        const asset = await fetch("python/assets/offscreen.pyxres")
-        const assetData = new DataView(await asset.arrayBuffer())
-        pyodide.FS.mkdir("assets")
-        pyodide.FS.writeFile("assets/offscreen.zip",assetData,{ encoding: 'binary' })
 
-        const response = await fetch(`python/${filename}.py`)
-        if (response.status != 200)
-        {
-          pyodide.runPython(await (await fetch("python/00_moving_square.py")).text())
-        }
-        else {
-          pyodide.runPython(await response.text())
-        }
+<head>
+  <title>pyodide</title>
+  <script src="./pyodide.js"></script>
+</head>
+
+<body>
+  <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  <script type="text/javascript">
+    async function main() {
+      const filename = (new URLSearchParams(location.search)).get("py") || "11_offscreen"
+      const pyodide = await loadPyodide();
+      await pyodide.loadPackage("micropip")
+      const micropip = pyodide.pyimport("micropip")
+      await micropip.install("pyxel-1.8.0-cp37-abi3-emscripten_3_1_14_wasm32.whl")
+      pyodide.FS.mkdir("assets")
+      for (let assetName of ["offscreen.pyxres", "cat_16x16.png", "tileset_24x32.png"]) {
+        const asset = await fetch(`python/assets/${assetName}`)
+        const assetData = new Uint8Array(await asset.arrayBuffer())
+        pyodide.FS.writeFile(`assets/${assetName}`, assetData, { encoding: 'binary' })
       }
-      main()
-    </script>
-  </body>
+
+      const response = await fetch(`python/${filename}.py`)
+      if (response.status != 200) {
+        pyodide.runPython(await (await fetch("python/00_moving_square.py")).text())
+      }
+      else {
+        pyodide.runPython(await response.text())
+      }
+    }
+    main()
+  </script>
+</body>
+
 </html>
