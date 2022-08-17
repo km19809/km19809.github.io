@@ -23,7 +23,7 @@
 </head>
 
 <body>
-  <button id="start">Start</button> <br>
+  <button id="start" type="button" disabled>Loading</button> <br>
   <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
   <script type="text/javascript">
     async function main() {
@@ -50,6 +50,8 @@
                 loop = WebLoop()
                 loop.call_soon(frame, loop)
         `))
+      startButton.disabled = false
+      startButton.innerText = "Start"
     }
     main()
   </script>

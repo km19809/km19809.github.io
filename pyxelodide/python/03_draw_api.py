@@ -5,6 +5,7 @@ def run(update, draw):
     def frame(loop):
         update()
         draw()
+        pyxel.flip()
         loop.call_soon(frame, loop)
     loop = WebLoop()
     loop.call_soon(frame, loop)
