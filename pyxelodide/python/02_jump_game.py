@@ -1,14 +1,5 @@
-from pyodide.webloop import WebLoop 
 import pyxel
 
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 class App:
     def __init__(self):
@@ -26,7 +17,7 @@ class App:
             (i * 60, pyxel.rndi(0, 104), pyxel.rndi(0, 2), True) for i in range(4)
         ]
         pyxel.playm(0, loop=True)
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):

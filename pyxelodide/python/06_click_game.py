@@ -1,14 +1,4 @@
-from pyodide.webloop import WebLoop 
 import pyxel
-
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 SCREEN_WIDTH = 256
 SCREEN_HEIGHT = 256
@@ -65,7 +55,7 @@ class App:
         self.is_exploded = False
         self.bubbles = [Bubble() for _ in range(NUM_INITIAL_BUBBLES)]
 
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):

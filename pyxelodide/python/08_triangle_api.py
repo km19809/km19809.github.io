@@ -1,5 +1,5 @@
-from pyodide.webloop import WebLoop # Use browser event loop
 import pyxel
+
 
 def draw_triangle(x1, y1, x2, y2, x3, y3, n):
     if n == 0:
@@ -25,16 +25,10 @@ pyxel.cls(13)
 pyxel.text(6, 6, "tri(x1,y1,x2,y2,x3,y3,col)", 7)
 pyxel.text(6, 14, "trib(x1,y1,x2,y2,x3,y3,col)", 7)
 triangles = [(100, 24, 7, 143, 193, 143, 7)]
-
-# Emulate infinite loop
-def frame(loop):
+while True:
     if pyxel.btnp(pyxel.KEY_Q):
-        return
+        pyxel.quit()
     if triangles:
         triangle = triangles.pop(0)
         draw_triangle(*triangle)
     pyxel.flip()
-    loop.call_soon(frame, loop)
-
-loop = WebLoop()
-loop.call_soon(frame, loop)

@@ -1,20 +1,11 @@
-from pyodide.webloop import WebLoop 
 import pyxel
 
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 class App:
     def __init__(self):
         pyxel.init(160, 120, title="Hello Pyxel")
         pyxel.image(0).load(0, 0, "assets/pyxel_logo_38x16.png")
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):

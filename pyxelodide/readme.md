@@ -22,3 +22,7 @@ The examples are modified to use the web loop.
 Broken:
  1. [Draw api](test_pyxel_fs.html?py=03_draw_api) : Position of cursor is not correct. It assumes the canvas is at the center.
  1. [Click game](test_pyxel_fs.html?py=06_click_game): same as above. Unable to play.
+
+ ## Games
+1. [30SecondsOfDaylight.pyxapp](test_pyxel_play.html?pyxapp=30SecondsOfDaylight) - 1st Pyxel Jam winning game by [Adam](https://twitter.com/helpcomputer0)
+1. [megaball.pyxapp](test_pyxel_play.html?pyxapp=megaball) - Arcade ball physics game by [Adam](https://twitter.com/helpcomputer0)

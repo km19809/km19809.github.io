@@ -1,14 +1,5 @@
-from pyodide.webloop import WebLoop 
 import pyxel
 
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 class App:
     def __init__(self):
@@ -59,7 +50,7 @@ class App:
             "f0ra4r f0ra4r f0ra4r f0f0a4r", "n", "6622 6622 6622 6422", "f", 25
         )
         self.play_music(True, True, True)
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def play_music(self, ch0, ch1, ch2):
         if ch0:

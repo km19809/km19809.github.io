@@ -1,14 +1,4 @@
-from pyodide.webloop import WebLoop 
 import pyxel
-
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 SCENE_TITLE = 0
 SCENE_PLAY = 1
@@ -216,7 +206,7 @@ class App:
         self.score = 0
         self.background = Background()
         self.player = Player(pyxel.width / 2, pyxel.height - 20)
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btn(pyxel.KEY_Q):

@@ -1,4 +1,3 @@
-from pyodide.webloop import WebLoop # Use browser event loop
 import pyxel
 
 BORDER_OFFSETS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
@@ -112,14 +111,9 @@ pyxel.init(223, 92, title="Offscreen Rendering")
 pyxel.load("assets/offscreen.pyxres")
 blt_figure = make_blt_figure()
 bltm_figure = make_bltm_figure()
-# Emulate infinite loop
-def frame(loop):
+while True:
     if pyxel.btnp(pyxel.KEY_Q):
-        return
+        pyxel.quit()
     figure = blt_figure if (pyxel.frame_count // 120) % 2 == 0 else bltm_figure
     pyxel.blt(0, 0, figure, 0, 0, figure.width, figure.height)
     pyxel.flip()
-    loop.call_soon(frame, loop)
-
-loop = WebLoop()
-loop.call_soon(frame, loop)

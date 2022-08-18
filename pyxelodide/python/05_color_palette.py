@@ -1,14 +1,5 @@
-from pyodide.webloop import WebLoop 
 import pyxel
 
-def show():
-    def frame(loop):
-        if pyxel.btnp(pyxel.KEY_Q):
-            return
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 def draw_palette(x, y, col):
     rgb = pyxel.colors[col]
@@ -26,5 +17,4 @@ pyxel.init(255, 81, title="Pyxel Color Palette")
 pyxel.cls(0)
 for i in range(16):
     draw_palette(2 + (i % 4) * 64, 4 + (i // 4) * 20, i)
-
-show()
+pyxel.show()

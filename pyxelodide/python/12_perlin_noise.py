@@ -1,25 +1,14 @@
-from pyodide.webloop import WebLoop 
 import pyxel
 
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 
 class App:
     def __init__(self):
         pyxel.init(64, 64, title="Perlin Noise", capture_scale=4)
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
-        if pyxel.frame_count == 300:
-            pyxel.screencast()
 
     def draw(self):
         pyxel.cls(0)

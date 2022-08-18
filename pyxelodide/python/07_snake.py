@@ -14,17 +14,9 @@ Created by Marcus Croucher in 2018.
 """
 
 from collections import deque, namedtuple
-from pyodide.webloop import WebLoop 
+
 import pyxel
 
-def run(update, draw):
-    def frame(loop):
-        update()
-        draw()
-        pyxel.flip()
-        loop.call_soon(frame, loop)
-    loop = WebLoop()
-    loop.call_soon(frame, loop)
 Point = namedtuple("Point", ["x", "y"])  # Convenience class for coordinates
 
 
@@ -73,7 +65,7 @@ class Snake:
         )
         define_sound_and_music()
         self.reset()
-        run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)
 
     def reset(self):
         """Initiate key variables (direction, snake, apple, score, etc.)"""
