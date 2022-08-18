@@ -2,7 +2,7 @@
 [pyxel](https://github.com/kitao/pyxel) on [pyodide](https://github.com/pyodide/pyodide)
 
 It is malfunctioning a bit.
-It uses [a fork of pyodide]([pyodide](https://github.com/km19809/pyodide))
+It uses [a fork of pyodide](https://github.com/km19809/pyodide)
 This page is just for demonstration.
 
 ## Examples
