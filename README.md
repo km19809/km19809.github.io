@@ -8,7 +8,7 @@
 * [카카오톡 비밀 메시지 만들기](https://km19809.github.io/figlet/index.html) 2021.05.28
 * [색을 듣다](https://km19809.github.io/hear-the-colors) Hear the colors 2021.08.23
 * [연주자를 찾아라](https://km19809.github.io/find-the-player) Find the player 2021.09.04
-* [Pyxelodide](/pyxelodide/) 2022.08.16 ~
+* [Pyxelodide](/pyxelodide/) 2022.08.16 ~ 2022.10.2
 
 ### 자작 (외부 링크)
 
@@ -23,6 +23,7 @@
 * [무지개 카드 무제한](https://svelte.dev/repl/498d2389ca2546a2866a6f6cfbe265fc) 2020.09.27
 * [컴퍼스 (Github Page)](https://km19809.github.io/game-of-compass/index.html) 2021.08.27
 * [오리배](https://svelte.dev/repl/70ce73d4da69414b8811285e082aa57a) 2021.10.03
+* [미스](https://svelte.dev/repl/006c24fbafb547c6a0c5b6fb95e71a38) 2021.11
 
 <!--
 ### Jekyll Themes

@@ -1,9 +1,15 @@
-# [WIP] Pyxelodide
+# [ARCHIVED] Pyxelodide
+## !! IMPORTANT !!
+**Pyxel officially supports [wasm](https://kitao.github.io/pyxel/wasm/launcher/) now!**
+
+## Introduction
+> 2022.08.16 ~ 2022.10.2
+
 [pyxel](https://github.com/kitao/pyxel) on [pyodide](https://github.com/pyodide/pyodide)
 
 It is malfunctioning a bit.
 It uses [a fork of pyodide](https://github.com/km19809/pyodide)
-This page is just for demonstration.
+This page is just for demonstration and archiving.
 
 ## Examples
 The examples are modified to use the web loop.
