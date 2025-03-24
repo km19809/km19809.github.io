@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Tic Tac Toe</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+
+        #game {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            padding: 20px;
+            min-height: 3em;
+            font-size: 2rem;
+            background-color: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        #reset {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Tic Tac Toe</h1>
+    <div id="game"></div>
+    <button id="share">Share Game</button>
+    <button id="reset">Reset Game</button>
+    <p id="status"></p>
+
+    <script>
+        function numberToBytes(number) {
+            const len = Math.max(Math.ceil(Math.log2(number) / 8), 1);
+            const byteArray = new Uint8Array(len);
+
+            for (let index = 0; index < byteArray.length; index++) {
+                const byte = number & 0xff;
+                byteArray[index] = byte;
+                number = (number - byte) / 256;
+            }
+
+            return byteArray;
+        }
+
+        function bytesToNumber(byteArray) {
+            let result = 0;
+            for (let i = byteArray.length - 1; i >= 0; i--) {
+                result = (result * 256) + byteArray[i];
+            }
+
+            return result;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const boardSize = 3;
+
+            function encodeState(board) {
+                const state = board.map(cell => cell === "X" ? 1 : cell === "O" ? 2 : 0).reduce((prev, curr) => prev * 3 + curr);
+                const bytes = numberToBytes(state);
+                return btoa(bytes);
+            }
+
+            function decodeState(query) {
+                const numCells = boardSize * boardSize;
+                try {
+                    const bytes = Uint8Array.from(atob(query).split(",").map(n => parseInt(n, 10)));
+                    let encoded = bytesToNumber(bytes);
+                    const state = [];
+                    const availableStates = 3
+                    for (let i = 0; i < numCells; i++) {
+                        state.unshift(encoded % availableStates);
+                        encoded = Math.floor(encoded / availableStates);
+                    }
+                    return state.map(n => n === 1 ? "X" : n === 2 ? "O" : null);
+                } catch {
+                    return Array(numCells).fill(null);
+                }
+            }
+
+            function getCurrentPlayer(board) {
+                const xCount = board.filter(cell => cell === "X").length;
+                const oCount = board.filter(cell => cell === "O").length;
+                return xCount <= oCount ? "X" : "O";
+            }
+
+            function checkWinner(board) {
+                const lines = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                    [0, 4, 8], [2, 4, 6]
+                ];
+                for (let [a, b, c] of lines) {
+                    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                        return board[a];
+                    }
+                }
+                return board.every(cell => cell) ? "Tie" : null;
+            }
+
+            function createBoard(board) {
+                const container = document.getElementById("game");
+                const status = document.getElementById("status");
+                container.innerHTML = "";
+
+                const winner = checkWinner(board);
+                if (winner) {
+                    status.textContent = winner === "Tie" ? "It's a tie!" : `${winner} wins!`;
+                    document.getElementById("reset").style = "display: inline-block;"
+                }
+
+                board.forEach((cell, i) => {
+                    const button = document.createElement("button");
+                    button.textContent = cell || "";
+                    button.className = "cell";
+                    button.disabled = cell || winner;
+
+                    button.addEventListener("click", () => {
+                        if (cell || winner) return;
+                        board[i] = getCurrentPlayer(board);
+                        const nextQuery = encodeState(board);
+                        window.location.search = `?si=${nextQuery}`;
+                    });
+
+                    container.appendChild(button);
+                });
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const state = decodeState(params.get("si") || "");
+
+            createBoard(state);
+
+            document.getElementById("share").addEventListener("click", async () => {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: "Tic Tac Toe",
+                            text: "Play Tic Tac Toe with me!",
+                            url: window.location.href,
+                        });
+                    } catch (error) {
+                        alert("Error sharing: " + error);
+                    }
+                } else {
+                    alert("Web Share API not supported in this browser.");
+                }
+            });
+
+            document.getElementById("reset").addEventListener("click", () => { location.href = location.pathname })
+
+        });
+    </script>
+</body>
+
+</html>

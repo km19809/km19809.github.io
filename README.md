@@ -9,6 +9,7 @@
 * [색을 듣다](https://km19809.github.io/hear-the-colors) Hear the colors 2021.08.23
 * [연주자를 찾아라](https://km19809.github.io/find-the-player) Find the player 2021.09.04
 * [Pyxelodide](/pyxelodide/) 2022.08.16 ~ 2022.10.2
+* [Static Multiplayer - Tic Tac Toe](/public/tic-tac-toe.html) 2025.03.24
 
 ### 자작 (외부 링크)
 
