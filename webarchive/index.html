@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webarchive Extractor (Pyodide)</title>
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --primary-hover-color: #2563EB;
+            --secondary-color: #10B981;
+            --secondary-hover-color: #059669;
+            --background-color: #F9FAFB;
+            --container-bg-color: #FFFFFF;
+            --text-primary-color: #1F2937;
+            --text-secondary-color: #6B7281;
+            --border-color: #D1D5DB;
+            --disabled-color: #9CA3AF;
+            --status-bg-color: #F3F4F6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: var(--container-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .language-selector {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--container-bg-color);
+            color: var(--text-secondary-color);
+            font-size: 14px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary-color);
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            text-align: center;
+            color: var(--text-secondary-color);
+            font-size: 16px;
+            font-weight: normal;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        
+        label{
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            cursor: pointer;
+            text-align: center;
+            background-color: var(--background-color);
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:hover {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover-color);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        button:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--status-bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary-color);
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        #downloadLink {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        #downloadLink.visible {
+            display: grid;
+        }
+
+
+        #downloadLink a {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        #downloadLink #showOutput {
+            background-color: #29a6a6;
+        }
+
+
+        #downloadLink a:hover {
+            background-color: var(--secondary-hover-color);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .checkbox-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        .checkbox-container label {
+            color: var(--text-secondary-color);
+            font-size: 14px;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary-color);
+            line-height: 1.5;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .privacy-note {
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <div class="language-selector">
+            <label for="languageSelect" data-i18n="languageSelect">Language:</label>
+            <select id="languageSelect">
+                <option value="en">English</option>
+                <option value="ko-KR">한국어</option>
+            </select>
+        </div>
+
+        <h1 data-i18n="title">Webarchive Extractor</h1>
+        <h3 data-i18n="subtitle">Extract files from your Webarchive file!</h3>
+
+        <label for="webarchiveFile" data-i18n="uploadFileLabel">Upload .webarchive file:</label>
+        <input type="file" id="webarchiveFile" accept=".webarchive" disabled>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="singleFileToggle">
+            <label for="singleFileToggle" data-i18n="singleFileCheckbox">Extract to single HTML, instead of ZIP
+                (maybe slower)</label>
+        </div>
+
+        <button id="processButton" disabled data-i18n="processButton">Process Webarchive</button>
+
+        <div id="status" data-i18n="statusReady">Status: Ready.</div>
+
+        <div id="downloadLink">
+            <a href="#" id="downloadOutput" download data-i18n="downloadResultButton">Download Result</a>
+            <a href="#" id="showOutput" data-i18n="showResultFullscreenButton">Show Result Fullscreen</a>
+        </div>
+
+        <iframe id="testFrame" name="frameToPrint" style="display: none;" allow="fullscreen"></iframe>
+        <footer class="footer">
+            <div>
+                <span data-i18n="poweredBy">Powered by</span> <a href="https://pyodide.org" target="_blank">Pyodide</a>
+                <span data-i18n="and">and</span>
+                <a href="https://github.com/bmjcode/pywebarchive" target="_blank">pywebarchive</a>
+            </div>
+            <div class="privacy-note">
+                <span data-i18n="privacyNote">Your files stay completely private – everything is processed locally in
+                    your
+                    browser with zero server uploads! 🔒</span>
+            </div>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <script>
+        let pyodide;
+        let webarchiveFileName = '';
+        const OUTPUT_HTML_PATH = 'output.html';
+        const OUTPUT_DIR_NAME = 'output_files'; // The directory where webarchive puts other assets
+        const ZIP_FILE_NAME = 'extracted_archive.zip';
+
+        const translations = {
+            "en": {
+                "languageSelect": "Language:",
+                "title": "Webarchive Extractor",
+                "subtitle": "Extract files (ZIP or HTML) from your Webarchive file!",
+                "uploadFileLabel": "Upload .webarchive file:",
+                "singleFileCheckbox": "Extract to single HTML, instead of ZIP (maybe slower)",
+                "processButton": "Process Webarchive",
+                "statusReady": "Status: Ready.",
+                "downloadResultButton": "Download Result",
+                "showResultFullscreenButton": "Show Result Fullscreen",
+                "poweredBy": "Powered by",
+                "and": "and",
+                "privacyNote": "Your files stay completely private – everything is processed locally in your browser with zero server uploads! 🔒",
+                "statusLoadingPyodide": "Status: Loading Pyodide...",
+                "statusPyodideLoaded": "Status: Pyodide loaded. Installing pywebarchive...",
+                "statusPyodideReady": "Status: Pyodide and pywebarchive are ready. Upload your file.",
+                "errorLoading": "Error loading Pyodide or packages: ",
+                "statusFileSelected": "Status: File \"{fileName}\" selected. Click Process.",
+                "statusNoFile": "Status: No file selected.",
+                "statusSelectFileError": "Status: Please select a file and ensure Pyodide is loaded.",
+                "statusProcessing": "Status: Processing... This might take a moment.",
+                "statusProcessingComplete": "Status: Processing complete. Result is ready for download.",
+                "errorProcessing": "Status: Error during processing: ",
+            },
+            "ko-KR": {
+                "languageSelect": "언어선택:",
+                "title": "Webarchive 변환기",
+                "subtitle": "당신의 Webarchive를 HTML이나 ZIP으로 변환하세요!",
+                "uploadFileLabel": ".webarchive 파일 업로드:",
+                "singleFileCheckbox": "ZIP 대신 단일 HTML로 추출 (느릴 수 있음)",
+                "processButton": "Webarchive 변환",
+                "statusReady": "상태: 준비 완료.",
+                "downloadResultButton": "결과 다운로드",
+                "showResultFullscreenButton": "전체 화면으로 결과 보기",
+                "poweredBy": "사용된 기술:",
+                "and": "및",
+                "privacyNote": "당신의 파일은 완전히 비공개됩됩니다 – 모든 과정은 서버 업로드 없이 브라우저에서 처리됩니다! 🔒",
+                "statusLoadingPyodide": "상태: Pyodide 로드 중...",
+                "statusPyodideLoaded": "상태: Pyodide 로드 완료. pywebarchive 설치 중...",
+                "statusPyodideReady": "상태: Pyodide 및 pywebarchive 준비 완료. 파일을 업로드하세요.",
+                "errorLoading": "Pyodide 또는 패키지 로드 오류: ",
+                "statusFileSelected": "상태: \"{fileName}\" 파일이 선택되었습니다. 처리를 클릭하세요.",
+                "statusNoFile": "상태: 파일이 선택되지 않았습니다.",
+                "statusSelectFileError": "상태: 파일을 선택하고 Pyodide가 준비되었는지 확인하세요.",
+                "statusProcessing": "상태: 처리 중... 잠시 시간이 걸릴 수 있습니다.",
+                "statusProcessingComplete": "상태: 처리 완료. 결과를 다운로드할 수 있습니다.",
+                "errorProcessing": "상태: 처리 중 오류 발생: ",
+            }
+        };
+
+        function setLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    let text = translations[lang][key];
+                    if (key === "statusFileSelected") {
+                        text = text.replace("{fileName}", webarchiveFileName);
+                    }
+                    element.textContent = text;
+                }
+            });
+            // Update status text separately as it can be dynamic
+            const statusElement = document.getElementById('status');
+            const currentStatusText = statusElement.textContent;
+            const currentStatusKey = statusElement.getAttribute('data-current-i18n-key');
+            if (currentStatusKey && translations[lang] && translations[lang][currentStatusKey]) {
+                let newStatusText = translations[lang][currentStatusKey];
+                if (currentStatusKey === "statusFileSelected") {
+                    newStatusText = newStatusText.replace("{fileName}", webarchiveFileName);
+                }
+                statusElement.textContent = newStatusText;
+            }
+
+        }
+
+        function updateStatus(key, fileName = '') {
+            const statusElement = document.getElementById('status');
+            statusElement.setAttribute('data-current-i18n-key', key);
+            let text = translations[navigator.language.startsWith('ko') ? 'ko-KR' : 'en'][key];
+            if (key === "statusFileSelected") {
+                text = text.replace("{fileName}", fileName);
+            }
+            statusElement.textContent = text;
+        }
+
+        async function main() {
+            try {
+                const status = document.getElementById('status');
+                updateStatus('statusLoadingPyodide');
+                pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
+                });
+                updateStatus('statusPyodideLoaded');
+
+                await pyodide.loadPackage("micropip");
+                await pyodide.runPythonAsync(`
+                    import micropip
+                    await micropip.install("pywebarchive")
+                `);
+                document.getElementById("webarchiveFile").disabled = false;
+                updateStatus('statusPyodideReady');
+            } catch (error) {
+                document.getElementById('status').innerText = `${translations[navigator.language.startsWith('ko') ? 'ko-KR' : 'en'].errorLoading} ${error}`;
+                console.error("Pyodide init error:", error);
+            }
+        }
+
+        document.getElementById('languageSelect').addEventListener('change', function () {
+            setLanguage(this.value);
+        });
+
+        document.getElementById('webarchiveFile').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                webarchiveFileName = file.name;
+                updateStatus('statusFileSelected', webarchiveFileName);
+                document.getElementById('processButton').disabled = false;
+                document.getElementById('downloadLink').classList.remove('visible');
+            } else {
+                webarchiveFileName = '';
+                updateStatus('statusNoFile');
+                document.getElementById('processButton').disabled = true;
+            }
+        });
+
+        document.getElementById('processButton').addEventListener('click', async function () {
+            const fileInput = document.getElementById('webarchiveFile');
+            const file = fileInput.files[0];
+            if (!file || !pyodide) {
+                updateStatus('statusSelectFileError');
+                return;
+            }
+
+            updateStatus('statusProcessing');
+            document.getElementById('processButton').disabled = true;
+            document.getElementById('downloadLink').classList.remove('visible');
+
+
+            const isSingleFile = document.getElementById('singleFileToggle').checked;
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                pyodide.FS.writeFile(webarchiveFileName, uint8Array);
+
+                await pyodide.runPythonAsync(`
+                    import webarchive
+                    import os
+                    import zipfile
+
+                    archive_path = "${webarchiveFileName}"
+                    output_html_path = "${OUTPUT_HTML_PATH}"
+                    output_dir_name = "${OUTPUT_DIR_NAME}"
+                    single_file_mode = ${isSingleFile ? "True" : "False"}
+
+                    if os.path.exists(output_html_path):
+                        os.remove(output_html_path)
+                    if os.path.exists(output_dir_name):
+                        for root, dirs, files in os.walk(output_dir_name, topdown=False):
+                            for name in files:
+                                os.remove(os.path.join(root, name))
+                            for name in dirs:
+                                os.rmdir(os.path.join(root, name)) # remove empty dir
+                        os.rmdir(output_dir_name)
+
+                    with webarchive.open(archive_path) as archive:
+                        archive.extract(output_html_path, embed_subresources=single_file_mode)
+
+                    if not single_file_mode:
+                        zip_filename = "${ZIP_FILE_NAME}"
+                        with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                            if os.path.exists(output_html_path):
+                                zipf.write(output_html_path, os.path.basename(output_html_path))
+                            
+                            if os.path.exists(output_dir_name):
+                                for root, dirs, files in os.walk(output_dir_name):
+                                    for file in files:
+                                        file_path = os.path.join(root, file)
+                                        arcname = os.path.relpath(file_path, os.path.dirname(output_html_path))
+                                        zipf.write(file_path, arcname)
+
+                    os.remove(archive_path)
+                `);
+
+                const downloadFilename = isSingleFile ? OUTPUT_HTML_PATH : ZIP_FILE_NAME;
+                const downloadData = pyodide.FS.readFile(downloadFilename);
+                const downloadMime = isSingleFile ? "text/html" : "application/zip";
+
+                const blob = new Blob([downloadData], { type: downloadMime });
+                const url = URL.createObjectURL(blob);
+
+                const downloadLink = document.getElementById('downloadOutput');
+                downloadLink.href = url;
+                downloadLink.download = downloadFilename;
+                document.getElementById('downloadLink').classList.add('visible');
+
+                updateStatus('statusProcessingComplete');
+                document.getElementById('processButton').disabled = false;
+
+                if (isSingleFile) {
+                    const testFrame = document.getElementById("testFrame");
+                    testFrame.src = url;
+                    testFrame.addEventListener("fullscreenchange", function (event) {
+                        if (document.fullscreenElement) {
+                            testFrame.style.display = "block"
+                        } else {
+                            testFrame.style.display = "none";
+                        }
+                    })
+
+                    const showLink = document.getElementById("showOutput");
+                    showLink.onclick = function (_) {
+                        testFrame.requestFullscreen();
+                    }
+                    showLink.style.display = "inline-block";
+                }
+                downloadLink.onclick = () => {
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                };
+
+            } catch (error) {
+                document.getElementById('status').innerText = `${translations[navigator.language.startsWith('ko') ? 'ko-KR' : 'en'].errorProcessing} ${error}`;
+                console.error("Python script error:", error);
+                document.getElementById('processButton').disabled = false;
+            }
+        });
+
+        // Initialize Pyodide when the page loads
+        main();
+
+        // Set initial language based on browser preference or default to English
+        const userLang = navigator.language || navigator.userLanguage;
+        const initialLang = userLang.startsWith('ko') ? 'ko-KR' : 'en';
+        document.getElementById('languageSelect').value = initialLang;
+        setLanguage(initialLang);
+    </script>
+</body>
+
+</html>
