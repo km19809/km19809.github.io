@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Gallery</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f0f0f; color: #eee; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .panel { background: #1a1a1a; padding: 20px; border-radius: 12px; margin-bottom: 20px; width: 95%; max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; border: 1px solid #333; }
+        .canvas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 95%; max-width: 1200px; }
+        .stage { background: #141414; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #222; position: relative; }
+        canvas { background: #000; max-width: 100%; height: auto; margin-top: 10px; border: 1px solid #333; }
+        input, button { background: #2a2a2a; color: white; border: 1px solid #444; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .btn-primary { background: #d35400; font-weight: bold; cursor: pointer; border: none; }
+        .btn-secondary { background: #2980b9; font-weight: bold; cursor: pointer; border: none; margin-top: 10px;}
+        button:hover { opacity: 0.8; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        label { font-size: 10px; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .cursor { position: absolute; width: 14px; height: 14px; border: 2px solid #e74c3c; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0 8px #e74c3c; }
+        #status { font-size: 12px; color: #f1c40f; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <p>Original: Check <a href="https://www.youtube.com/watch?v=ldxFjLJ3rVY">this stunning video</a> from 3B1B!</p>
+    <div id="status">Warming up Python Engine...</div>
+
+    <div class="panel">
+        <div>
+            <label>1. Source</label>
+            <input type="file" id="loader" accept="image/*">
+        </div>
+        <div>
+            <label>Scale Factor (s)</label>
+            <input type="number" id="sf" value="256">
+        </div>
+        <div>
+            <label>Center (X, Y Ratio)</label>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="curX" value="0.00" readonly>
+                <input type="text" id="curY" value="0.00" readonly>
+            </div>
+        </div>
+        <div>
+            <label>Controls</label>
+            <button id="renderBtn" class="btn-primary" disabled>Update Previews</button>
+            <button id="downloadBtn" class="btn-secondary" disabled>Download High-Res</button>
+        </div>
+    </div>
+
+    <div class="canvas-grid">
+        <div class="stage"><label>A: Input Selection</label><div style="position:relative; display:inline-block"><canvas id="cvsA" width="400" height="400"></canvas><div id="laser" class="cursor" style="left: 200px; top: 200px;"></div></div></div>
+        <div class="stage"><label>B: Log-Polar</label><canvas id="cvsB" width="400" height="400"></canvas></div>
+        <div class="stage"><label>C: Log-Space Twist</label><canvas id="cvsC" width="400" height="400"></canvas></div>
+        <div class="stage"><label>D: Result Preview</label><canvas id="cvsD" width="400" height="400"></canvas></div>
+    </div>
+
+<script type="text/javascript">
+    const status = document.getElementById('status');
+    const renderBtn = document.getElementById('renderBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const laser = document.getElementById('laser');
+    let pyodide;
+
+    const pythonCode = `
+import numpy as np
+
+def _get_sampling_base(complex_coords, w, h, ln_s, is_periodic, bleed=0.0):
+    """Calculate coord and mask"""
+    # 1. Calculate log radius and mask
+    log_r = np.log(np.abs(complex_coords) + 1e-9)
+    if is_periodic:
+        mask = np.ones_like(log_r, dtype=bool)
+    else:
+        # Adjust mask with bleed value
+        mask = (log_r >= -ln_s) & (log_r <= 0.0 + bleed)
+
+    # 2. 픽셀 좌표로 변환 (Float 형태 유지)
+    fx = (complex_coords.real + 1) * 0.5 * (w - 1)
+    fy = (complex_coords.imag + 1) * 0.5 * (h - 1)
+    
+    return mask, fx, fy
+
+def sample_complex(img, complex_coords, w, h, ln_s, is_periodic=False, method='bilinear', bleed=0.0):
+    """
+    method: 'bilinear' | 'nearest'
+    """
+    mask, fx, fy = _get_sampling_base(complex_coords, w, h, ln_s, is_periodic, bleed)
+    
+    if method == 'bilinear':
+        # --- Bilinear Interpolation 로직 ---
+        x0 = np.floor(fx).astype(np.int32)
+        y0 = np.floor(fy).astype(np.int32)
+        x1 = np.clip(x0 + 1, 0, w - 1)
+        y1 = np.clip(y0 + 1, 0, h - 1)
+        x0 = np.clip(x0, 0, w - 1)
+        y0 = np.clip(y0, 0, h - 1)
+
+        dx = fx - x0
+        dy = fy - y0
+
+        w1, w2 = (1 - dx) * (1 - dy), dx * (1 - dy)
+        w3, w4 = (1 - dx) * dy, dx * dy
+
+        # Align axes for (H, W, C)
+        res = (img[y0, x0].T * w1).T + (img[y0, x1].T * w2).T + \
+              (img[y1, x0].T * w3).T + (img[y1, x1].T * w4).T
+              
+    else:
+        # --- Nearest Neighbor ---
+        sx = np.clip(fx.astype(np.int32), 0, w - 1)
+        sy = np.clip(fy.astype(np.int32), 0, h - 1)
+        res = img[sy, sx]
+
+    res[~mask] = 0
+    return res.astype(np.uint8)
+
+def process_droste(img_proxy, w, h, s_factor, cx, cy, out_res, stages_needed):
+    img = np.array(img_proxy.to_py()).reshape((h, w, 4))
+    ln_s = np.log(s_factor)
+    f = 2 * np.pi
+    k = (f * 1j) / (f * 1j + ln_s)
+    z_center = cx + cy * 1j
+
+    y, x = np.ogrid[:out_res, :out_res]
+    results = []
+
+    # Mapping logic for Stage D (The High-Res Target)
+    if 'D' in stages_needed:
+        nx, ny = (x - out_res/2) / (out_res/2), (y - out_res/2) / (out_res/2)
+        z_dest = nx + 1j * ny
+        w_dest = np.log(z_dest + 1e-9)
+        w_center = np.log(z_center + 1e-9)
+        w_src = (w_dest - w_center) / k + w_center
+        
+        # Periodic Wrap
+        w_src_real = ((w_src.real % ln_s) + ln_s) % ln_s - ln_s
+        w_src_imag = w_src.imag % f
+        results.append(sample_complex(img, np.exp(w_src_real + 1j * w_src_imag), w, h, ln_s, True, bleed=0.05).tobytes())
+
+    # Mapping for Stage B & C (Always 400px previews)
+    if 'BC' in stages_needed:
+        py, px = np.ogrid[:400, :400]
+        # B
+        b_ln = (px / 400) * (ln_s * 2) - ln_s
+        b_th = (py / 400) * f
+        results.append(sample_complex(img, np.exp(b_ln + 1j * b_th), w, h, ln_s, method='nearest').tobytes())
+        # C
+        c_wr = (px / 400) * (2*f) - f
+        c_wi = (py / 400) * (2*f) - f
+        w_u = (c_wr + 1j * c_wi) / k
+        w_ur = ((w_u.real % ln_s) + ln_s) % ln_s - ln_s
+        w_ui = w_u.imag % f
+        results.append(sample_complex(img, np.exp(w_ur + 1j * w_ui), w, h, ln_s, bleed=0.05).tobytes())
+
+    return results
+`;
+
+    async function init() {
+        pyodide = await loadPyodide();
+        await pyodide.loadPackage("numpy");
+        await pyodide.runPythonAsync(pythonCode);
+        status.innerText = "Python Engine Ready.";
+        renderBtn.disabled = false;
+    }
+    init();
+
+    const canvases = { A: document.getElementById('cvsA'), B: document.getElementById('cvsB'), C: document.getElementById('cvsC'), D: document.getElementById('cvsD') };
+    const ctxs = Object.fromEntries(Object.entries(canvases).map(([k, v]) => [k, v.getContext('2d')]));
+    let sourceImg = null;
+
+    canvases.A.onmousedown = (e) => {
+        const rect = canvases.A.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        document.getElementById('curX').value = ((x - 200) / 200).toFixed(2);
+        document.getElementById('curY').value = ((y - 200) / 200).toFixed(2);
+        laser.style.left = x + 'px'; laser.style.top = y + 'px';
+    };
+
+    document.getElementById('loader').onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => { 
+                sourceImg = img; 
+                ctxs.A.drawImage(img, 0, 0, 400, 400); 
+                downloadBtn.disabled = false;
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    async function runTransform(res, stages) {
+        const off = document.createElement('canvas');
+        off.width = sourceImg.width; off.height = sourceImg.height;
+        const oCtx = off.getContext('2d');
+        oCtx.drawImage(sourceImg, 0, 0);
+        const data = oCtx.getImageData(0, 0, off.width, off.height).data;
+
+        const s = parseFloat(document.getElementById('sf').value);
+        const cx = parseFloat(document.getElementById('curX').value);
+        const cy = parseFloat(document.getElementById('curY').value);
+
+        return pyodide.globals.get('process_droste')(data, off.width, off.height, s, cx, cy, res, stages).toJs();
+    }
+
+    renderBtn.onclick = async () => {
+        status.innerText = "Updating Previews...";
+        const [bytesD, bytesB, bytesC] = await runTransform(400, "DBC");
+        ctxs.B.putImageData(new ImageData(new Uint8ClampedArray(bytesB), 400, 400), 0, 0);
+        ctxs.C.putImageData(new ImageData(new Uint8ClampedArray(bytesC), 400, 400), 0, 0);
+        ctxs.D.putImageData(new ImageData(new Uint8ClampedArray(bytesD), 400, 400), 0, 0);
+        status.innerText = "Previews Updated.";
+    };
+
+    downloadBtn.onclick = async () => {
+        const originalRes = Math.max(sourceImg.width, sourceImg.height);
+        status.innerText = `Generating High-Res (${originalRes}px)...`;
+        const [bytesD] = await runTransform(originalRes, "D");
+        
+        const outC = document.createElement('canvas');
+        outC.width = outC.height = originalRes;
+        outC.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(bytesD), originalRes, originalRes), 0, 0);
+        
+        const link = document.createElement('a');
+        link.download = 'droste_highres.png';
+        link.href = outC.toDataURL();
+        link.click();
+        status.innerText = "Download complete.";
+    };
+</script>
+</body>
+</html>

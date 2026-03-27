@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Droste Image Generator</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: #eee; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #2a2a2a; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-row { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        input, button { padding: 10px; border-radius: 5px; border: 1px solid #444; background: #333; color: white; }
+        button { background: #27ae60; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #2ecc71; }
+        canvas { margin-top: 20px; max-width: 100%; height: auto; border: 1px solid #555; background: white; }
+        .download-link { margin-top: 10px; color: #3498db; text-decoration: none; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Droste Generator</h2>
+    <div class="input-row">
+        <label>Scaling Factor (s) - Power of 2:</label>
+        <input type="number" id="factor" value="4">
+    </div>
+    <div class="input-row">
+        <label>Source Image (Optional):</label>
+        <input type="file" id="imgFile" accept="image/*">
+    </div>
+    <button id="generateBtn">Generate Droste Image</button>
+    <br>
+    <a id="downloadLnk" class="download-link" download="droste_test.png">Download Result</a>
+</div>
+
+<canvas id="outCvs"></canvas>
+
+<script>
+    const btn = document.getElementById('generateBtn');
+    const cvs = document.getElementById('outCvs');
+    const ctx = cvs.getContext('2d');
+    const dl = document.getElementById('downloadLnk');
+
+    btn.onclick = async () => {
+        const factor = parseFloat(document.getElementById('factor').value);
+        const fileInput = document.getElementById('imgFile');
+        const size = 2048;
+        cvs.width = cvs.height = size;
+
+        let sourceCanvas = document.createElement('canvas');
+        sourceCanvas.width = sourceCanvas.height = size;
+        let sCtx = sourceCanvas.getContext('2d');
+
+        if (fileInput.files && fileInput.files[0]) {
+            // Case 1: Use provided image
+            const img = await loadImage(fileInput.files[0]);
+            sCtx.drawImage(img, 0, 0, size, size);
+        } else {
+            // Case 2: Generate Grid
+            sCtx.fillStyle = "white";
+            sCtx.fillRect(0, 0, size, size);
+            sCtx.strokeStyle = "black";
+            sCtx.lineWidth = 2;
+            
+            const gridSize = size / factor;
+            for (let i = 0; i <= size; i += gridSize) {
+                // Vertical lines
+                sCtx.beginPath();
+                sCtx.moveTo(i, 0); sCtx.lineTo(i, size);
+                sCtx.stroke();
+                // Horizontal lines
+                sCtx.beginPath();
+                sCtx.moveTo(0, i); sCtx.lineTo(size, i);
+                sCtx.stroke();
+            }
+            // Add a red border to the center-most square for visual reference
+            sCtx.strokeStyle = "red";
+            sCtx.strokeRect(size/2 - gridSize/2, size/2 - gridSize/2, gridSize, gridSize);
+        }
+
+        // Apply Droste Effect
+        ctx.clearRect(0, 0, size, size);
+        ctx.drawImage(sourceCanvas, 0, 0);
+
+        let currentSize = size / factor;
+        while (currentSize >= 4) {
+            const offset = (size - currentSize) / 2;
+            ctx.drawImage(sourceCanvas, offset, offset, currentSize, currentSize);
+            currentSize /= factor;
+        }
+
+        dl.href = cvs.toDataURL();
+        dl.style.display = "block";
+    };
+
+    function loadImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+
+</body>
+</html>
