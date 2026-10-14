@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>학생 사진 파일명 변환</title>
+    <script type="module" crossorigin src="/assets/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/style.css">
+  </head>
+  <body>
+    <main class="container">
+      <h1>학생 사진 파일명 변환</h1>
+      <div class="steps">
+        <section class="step" aria-labelledby="roster-title">
+          <h2 id="roster-title">1. 학생 명단</h2>
+          <label for="roster-file">Excel 파일 (.xlsx)</label>
+          <input id="roster-file" type="file" accept=".xlsx" />
+          <div id="roster-config" hidden>
+            <div class="config-grid">
+              <label>시트 <select id="sheet"></select></label>
+              <label>번호 열 <input id="number-col" value="C" maxlength="3" autocomplete="off" /></label>
+              <label>이름 열 <input id="name-col" value="D" maxlength="3" autocomplete="off" /></label>
+              <label>시작 행 <input id="start-row" type="number" value="2" min="1" step="1" /></label>
+              <label>마지막 행 (선택) <input id="end-row" type="number" min="1" step="1" placeholder="자동" /></label>
+            </div>
+          </div>
+          <p id="roster-message" class="message" role="status">Excel 파일을 선택하세요.</p>
+          <div id="roster-preview" hidden>
+            <h3>학생 명단 미리보기</h3>
+            <div class="table-wrap"><table><thead><tr><th>번호</th><th>이름</th></tr></thead><tbody id="roster-rows"></tbody></table></div>
+          </div>
+        </section>
+        <section class="step" id="photo-step" aria-labelledby="photo-title">
+          <h2 id="photo-title">2. 사진</h2>
+          <fieldset id="photo-fieldset">
+            <div id="photo-drop" class="photo-drop">
+              <p><strong>사진 모두 드래그</strong></p>
+              <p class="hint">여러 장의 JPG/JPEG 사진을 한꺼번에 여기에 놓으세요.</p>
+              <label for="photo-files">또는 사진 모두 선택 (여러 장 선택 가능)</label>
+              <input id="photo-files" type="file" accept=".jpg,.jpeg,image/jpeg" multiple />
+              <label for="photo-folder">또는 사진 폴더 전체 선택</label>
+              <input id="photo-folder" type="file" accept=".jpg,.jpeg,image/jpeg" webkitdirectory multiple />
+              <p class="hint">폴더를 선택해도 해당 폴더의 사진만 사용하고 하위 폴더는 제외합니다.</p>
+            </div>
+          </fieldset>
+          <p id="photo-message" class="message" role="status">사진을 선택하세요.</p>
+          <div id="photo-preview" hidden>
+            <h3>사진 목록 미리보기</h3>
+            <div class="table-wrap"><table><thead><tr><th>순서</th><th>사진 파일명</th></tr></thead><tbody id="photo-rows"></tbody></table></div>
+          </div>
+        </section>
+        <section class="step" aria-labelledby="export-title">
+          <h2 id="export-title">3. 결과 받기</h2>
+          <p id="export-message" class="message" role="status">학생 명단과 사진을 선택하세요.</p>
+          <div id="match-preview" hidden>
+            <h3>대응관계 미리보기</h3>
+            <div class="table-wrap"><table><thead><tr><th>번호</th><th>이름</th><th>원본 사진</th><th>결과 파일명</th></tr></thead><tbody id="match-rows"></tbody></table></div>
+          </div>
+          <button type="button" id="download" disabled>ZIP 다운로드</button>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
